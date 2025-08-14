@@ -13,3 +13,5 @@ git cat-file -p commit_hash
 
 git cat-file -p tree_hash
 retrieve blobs
+
+## config
