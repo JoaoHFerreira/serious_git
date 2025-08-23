@@ -40,6 +40,29 @@ git merge name-of-branch
 ```
 This merges the specified branch into your current branch.
 
+**Visual representation of merge:**
+```
+main ---A---B---C (brancha merged)
+   \           \
+    D---E (branchb) \
+                      M (merge commit)
+```
+
+## Rebasing
+
+### Git Rebase
+```bash
+git rebase branch-name
+```
+Updates where your base points to by replaying your commits on top of another branch. This creates a linear history instead of merge commits.
+
+**Visual representation of rebase:**
+```
+main ---A---B---C
+                 \
+                  D'---E' (rebased branchb)
+```
+
 ## Viewing History and Changes
 
 ### Basic Commit History
