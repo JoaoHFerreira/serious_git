@@ -2,64 +2,145 @@
 
 ## Table of Contents
 
-1. [Configuration](#configuration)
-   - [Set Default Branch Name](#set-default-branch-name)
-2. [File Management](#file-management)
-   - [Ignore Files You Don't Want Committed](#ignore-files-you-dont-want-committed)
-3. [Branch Management](#branch-management)
-   - [Rename a Branch](#rename-a-branch)
-   - [Switch to a Branch (Alternative to checkout)](#switch-to-a-branch-alternative-to-checkout)
-4. [Merging](#merging)
-   - [Merge Branches](#merge-branches)
-5. [Rebasing](#rebasing)
-   - [Git Rebase](#git-rebase)
-6. [Resetting Changes](#resetting-changes)
-   - [Git Reset Options](#git-reset-options)
-   - [Reset Target Options](#reset-target-options)
-   - [When to Use Each](#when-to-use-each)
-7. [Comparing Changes](#comparing-changes)
-   - [Git Diff Between Branches](#git-diff-between-branches)
-8. [Viewing History and Changes](#viewing-history-and-changes)
-   - [Basic Commit History](#basic-commit-history)
-   - [Git Log Formatting Options](#git-log-formatting-options)
-   - [Advanced Git Log Combinations](#advanced-git-log-combinations)
-   - [Useful Log Filters](#useful-log-filters)
-9. [Additional Resources](#additional-resources)
+1. [Configuration](#1-configuration)
+   - 1.1 [Set Default Branch Name](#11-set-default-branch-name)
+2. [File Management](#2-file-management)
+   - 2.1 [Ignore Files You Don't Want Committed](#21-ignore-files-you-dont-want-committed)
+3. [Restoring and Resetting Changes](#3-restoring-and-resetting-changes)
+   - 3.1 [Git Restore vs Git Reset - Key Differences](#31-git-restore-vs-git-reset---key-differences)
+   - 3.2 [When to Use Each](#32-when-to-use-each)
+   - 3.3 [Reset Target Options](#33-reset-target-options)
+4. [Branch Management](#4-branch-management)
+   - 4.1 [Rename a Branch](#41-rename-a-branch)
+   - 4.2 [Switch to a Branch (Alternative to checkout)](#42-switch-to-a-branch-alternative-to-checkout)
+5. [Merging](#5-merging)
+   - 5.1 [Merge Branches](#51-merge-branches)
+6. [Rebasing](#6-rebasing)
+   - 6.1 [Git Rebase](#61-git-rebase)
+7. [Comparing Changes](#7-comparing-changes)
+   - 7.1 [Git Diff Between Branches](#71-git-diff-between-branches)
+8. [Viewing History and Changes](#8-viewing-history-and-changes)
+   - 8.1 [Basic Commit History](#81-basic-commit-history)
+   - 8.2 [Git Log Formatting Options](#82-git-log-formatting-options)
+   - 8.3 [Advanced Git Log Combinations](#83-advanced-git-log-combinations)
+   - 8.4 [Useful Log Filters](#84-useful-log-filters)
+9. [Additional Resources](#9-additional-resources)
 
-## Configuration
+## 1. Configuration
 
-### Set Default Branch Name
+### 1.1 Set Default Branch Name
 ```bash
 git config --global init.defaultBranch main
 ```
 
-## File Management
+## 2. File Management
 
-### Ignore Files You Don't Want Committed
-1. Add the file to `.gitignore`:
-   ```bash
-   echo the_created_changed_thing >> .gitignore
-   ```
-2. Restore the file to its last committed version:
-   ```bash
-   git restore the_created_changed_thing
-   ```
+### 2.1 Ignore Files You Don't Want Committed
+```bash
+echo the_created_changed_thing >> .gitignore
+```
 
-## Branch Management
+## 3. Restoring and Resetting Changes
 
-### Rename a Branch
+### 3.1 Git Restore vs Git Reset - Key Differences
+
+**Git Restore** - Works on files in working directory and staging area:
+```bash
+git restore file.txt                    # Restore file from last commit
+git restore --staged file.txt           # Unstage file (remove from staging area)
+git restore --source=HEAD~1 file.txt    # Restore file from specific commit
+```
+
+**Git Reset** - Moves the HEAD pointer and affects commit history:
+
+#### Soft Reset (--soft)
+```bash
+git reset --soft HEAD~1
+git reset --soft COMMIT_HASH
+```
+- Moves the HEAD pointer back to the specified commit
+- **Keeps all changes staged** (ready to commit)
+- Does NOT modify your working directory
+- Perfect for combining multiple commits into one
+- Safe option - no work is lost
+
+#### Hard Reset (--hard)  
+```bash
+git reset --hard HEAD~1
+git reset --hard COMMIT_HASH
+```
+- Moves the HEAD pointer back to the specified commit
+- **Permanently deletes all changes** in working directory and staging area
+- Resets everything to match the target commit exactly
+- **DANGEROUS** - Cannot be undone, all uncommitted work is lost
+- Use only when you want to completely abandon recent changes
+
+#### Mixed Reset (default)
+```bash
+git reset HEAD~1            # Same as git reset --mixed HEAD~1
+git reset COMMIT_HASH
+```
+- Moves the HEAD pointer back to the specified commit
+- **Unstages changes** but keeps them in working directory
+- You'll see your changes as "modified" files that need to be staged again
+- Middle ground between soft and hard reset
+
+### 3.2 When to Use Each
+
+**Use Git Restore when you want to:**
+- Undo changes to specific files without affecting commit history
+- Unstage files from the staging area  
+- Restore files from a specific commit
+- Work with individual files, not entire commits
+
+**Use Git Reset when you want to:**
+
+**--soft reset scenarios:**
+- Combine multiple small commits into one larger commit
+- Fix a commit message by uncommitting and recommitting
+- Reorganize recent commits before pushing
+- Undo commits but keep all your work staged
+
+**--mixed reset scenarios (default):**
+- Undo commits and review changes before re-committing
+- Split one large commit into multiple smaller commits
+- Unstage everything and start fresh with staging
+
+**--hard reset scenarios:**
+- Completely abandon recent experimental work
+- Return to a clean state matching a previous commit
+- Discard all local changes and match remote branch
+- **Warning: Only use when you're certain you want to lose all changes!**
+
+### 3.3 Reset Target Options
+
+#### Using HEAD~ notation
+- `HEAD~1` - Go back 1 commit
+- `HEAD~2` - Go back 2 commits  
+- `HEAD~3` - Go back 3 commits
+
+#### Using Commit Hash
+You can get the commit hash from `git log` and use it directly:
+```bash
+git reset --soft abc1234
+git reset --hard abc1234
+```
+
+## 4. Branch Management
+
+### 3.1 Rename a Branch
 ```bash
 git branch -m oldname newname
 ```
 
-### Switch to a Branch (Alternative to checkout)
+### 3.2 Switch to a Branch (Alternative to checkout)
 ```bash
 git switch branch-name
 ```
 
-## Merging
+## 4. Merging
 
-### Merge Branches
+### 4.1 Merge Branches
 This is normally done using a visual interface, but the command is available locally:
 ```bash
 git merge name-of-branch
@@ -74,9 +155,9 @@ main ---A---B---C (brancha merged)
                       M (merge commit)
 ```
 
-## Rebasing
+## 5. Rebasing
 
-### Git Rebase
+### 5.1 Git Rebase
 ```bash
 git rebase branch-name
 ```
@@ -89,9 +170,9 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## Resetting Changes
+## 6. Resetting Changes
 
-### Git Reset Options
+### 6.1 Git Reset Options
 
 #### Soft Reset
 ```bash
@@ -107,7 +188,7 @@ git reset --hard COMMIT_HASH
 ```
 Moves the HEAD pointer back and **permanently deletes** all changes in your working directory and staging area. Use with caution as this cannot be undone.
 
-### Reset Target Options
+### 6.2 Reset Target Options
 
 #### Using HEAD~ notation
 - `HEAD~1` - Go back 1 commit
@@ -121,7 +202,7 @@ git reset --soft abc1234
 git reset --hard abc1234
 ```
 
-### When to Use Each
+### 6.3 When to Use Each
 
 **Use `--soft` when:**
 - You want to combine multiple commits into one
@@ -133,9 +214,9 @@ git reset --hard abc1234
 - You want to return to a previous state and discard all work
 - **Warning:** This permanently deletes your changes!
 
-## Comparing Changes
+## 7. Comparing Changes
 
-### Git Diff Between Branches
+### 7.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -153,15 +234,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## Viewing History and Changes
+## 8. Viewing History and Changes
 
-### Basic Commit History
+### 8.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### Git Log Formatting Options
+### 8.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -187,7 +268,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### Advanced Git Log Combinations
+### 8.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -207,7 +288,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### Useful Log Filters
+### 8.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -228,7 +309,7 @@ git log --since="2 weeks ago" --until="yesterday"
 Shows commits within a specific time range.
 
 
-## Additional Resources
+## 9. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=2445)
