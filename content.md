@@ -15,3 +15,11 @@ git cat-file -p tree_hash
 retrieve blobs
 
 ## config
+
+
+
+## rename branch
+git branch -m oldname newname
+
+## Alterntive to checkout command
+git switch branch-name
