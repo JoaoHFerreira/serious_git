@@ -32,39 +32,43 @@
    - 8.1 [Adding Remote Origins](#81-adding-remote-origins)
    - 8.2 [Remote to Local Folder](#82-remote-to-local-folder)
    - 8.3 [Working with Remotes](#83-working-with-remotes)
-9. [Branch Management](#9-branch-management)
-   - 9.1 [Rename a Branch](#91-rename-a-branch)
-   - 9.2 [Switch to a Branch (Alternative to checkout)](#92-switch-to-a-branch-alternative-to-checkout)
-10. [Merging](#10-merging)
-   - 10.1 [Merge Branches](#101-merge-branches)
-11. [Rebasing](#11-rebasing)
-   - 11.1 [Git Rebase](#111-git-rebase)
-12. [Cherry-Picking Commits](#12-cherry-picking-commits)
-   - 12.1 [Basic Cherry-Pick](#121-basic-cherry-pick)
-   - 12.2 [Cherry-Pick Multiple Commits](#122-cherry-pick-multiple-commits)
-   - 12.3 [When to Use Cherry-Pick](#123-when-to-use-cherry-pick)
-13. [Squashing Commits](#13-squashing-commits)
-   - 13.1 [Interactive Rebase for Squashing](#131-interactive-rebase-for-squashing)
-   - 13.2 [Complete Squashing Workflow](#132-complete-squashing-workflow)
-   - 13.3 [Squashing Options Explained](#133-squashing-options-explained)
-   - 13.4 [When to Squash and When to Avoid](#134-when-to-squash-and-when-to-avoid)
-14. [Comparing Changes](#14-comparing-changes)
-   - 14.1 [Git Diff Between Branches](#141-git-diff-between-branches)
-15. [Viewing History and Changes](#15-viewing-history-and-changes)
-   - 15.1 [Basic Commit History](#151-basic-commit-history)
-   - 15.2 [Git Log Formatting Options](#152-git-log-formatting-options)
-   - 15.3 [Advanced Git Log Combinations](#153-advanced-git-log-combinations)
-   - 15.4 [Useful Log Filters](#154-useful-log-filters)
-16. [Data Recovery with Reflog](#16-data-recovery-with-reflog)
-   - 16.1 [Understanding Git Reflog](#161-understanding-git-reflog)
-   - 16.2 [Finding Lost Commits](#162-finding-lost-commits)
-   - 16.3 [Examining Objects with cat-file](#163-examining-objects-with-cat-file)
-   - 16.4 [Complete Recovery Workflow](#164-complete-recovery-workflow)
-17. [Debugging with Bisect](#17-debugging-with-bisect)
-   - 17.1 [Basic Git Bisect](#171-basic-git-bisect)
-   - 17.2 [Bisect Workflow](#172-bisect-workflow)
-   - 17.3 [When to Use Bisect](#173-when-to-use-bisect)
-18. [Additional Resources](#18-additional-resources)
+9. [Tagging Releases](#9-tagging-releases)
+   - 9.1 [Creating Tags](#91-creating-tags)
+   - 9.2 [Listing and Viewing Tags](#92-listing-and-viewing-tags)
+   - 9.3 [Working with Remote Tags](#93-working-with-remote-tags)
+10. [Branch Management](#10-branch-management)
+   - 10.1 [Rename a Branch](#101-rename-a-branch)
+   - 10.2 [Switch to a Branch (Alternative to checkout)](#102-switch-to-a-branch-alternative-to-checkout)
+11. [Merging](#11-merging)
+   - 11.1 [Merge Branches](#111-merge-branches)
+12. [Rebasing](#12-rebasing)
+   - 12.1 [Git Rebase](#121-git-rebase)
+13. [Cherry-Picking Commits](#13-cherry-picking-commits)
+   - 13.1 [Basic Cherry-Pick](#131-basic-cherry-pick)
+   - 13.2 [Cherry-Pick Multiple Commits](#132-cherry-pick-multiple-commits)
+   - 13.3 [When to Use Cherry-Pick](#133-when-to-use-cherry-pick)
+14. [Squashing Commits](#14-squashing-commits)
+   - 14.1 [Interactive Rebase for Squashing](#141-interactive-rebase-for-squashing)
+   - 14.2 [Complete Squashing Workflow](#142-complete-squashing-workflow)
+   - 14.3 [Squashing Options Explained](#143-squashing-options-explained)
+   - 14.4 [When to Squash and When to Avoid](#144-when-to-squash-and-when-to-avoid)
+15. [Comparing Changes](#15-comparing-changes)
+   - 15.1 [Git Diff Between Branches](#151-git-diff-between-branches)
+16. [Viewing History and Changes](#16-viewing-history-and-changes)
+   - 16.1 [Basic Commit History](#161-basic-commit-history)
+   - 16.2 [Git Log Formatting Options](#162-git-log-formatting-options)
+   - 16.3 [Advanced Git Log Combinations](#163-advanced-git-log-combinations)
+   - 16.4 [Useful Log Filters](#164-useful-log-filters)
+17. [Data Recovery with Reflog](#17-data-recovery-with-reflog)
+   - 17.1 [Understanding Git Reflog](#171-understanding-git-reflog)
+   - 17.2 [Finding Lost Commits](#172-finding-lost-commits)
+   - 17.3 [Examining Objects with cat-file](#173-examining-objects-with-cat-file)
+   - 17.4 [Complete Recovery Workflow](#174-complete-recovery-workflow)
+18. [Debugging with Bisect](#18-debugging-with-bisect)
+   - 18.1 [Basic Git Bisect](#181-basic-git-bisect)
+   - 18.2 [Bisect Workflow](#182-bisect-workflow)
+   - 18.3 [When to Use Bisect](#183-when-to-use-bisect)
+19. [Additional Resources](#19-additional-resources)
 
 ## 1. Configuration
 
@@ -512,21 +516,71 @@ git remote remove origin        # Remove remote connection
 git remote rename origin backup  # Rename remote
 ```
 
-## 9. Branch Management
+## 9. Tagging Releases
 
-### 9.1 Rename a Branch
+Git tags are used to mark specific points in history, typically for releases or important milestones. Tags create permanent references to commits that don't change over time.
+
+### 9.1 Creating Tags
+
+```bash
+# Create a lightweight tag
+git tag v1.0.0
+
+# Create an annotated tag (recommended for releases)
+git tag -a v1.0.0 -m "Release version 1.0.0"
+
+# Tag a specific commit
+git tag v1.0.0 COMMIT_HASH
+```
+
+**Lightweight vs Annotated tags:**
+- **Lightweight**: Just a pointer to a commit
+- **Annotated**: Contains metadata (author, date, message) - recommended for releases
+
+### 9.2 Listing and Viewing Tags
+
+```bash
+# List all tags
+git tag
+
+# List tags matching a pattern
+git tag -l "v1.*"
+
+# View tag information
+git show v1.0.0
+```
+
+### 9.3 Working with Remote Tags
+
+```bash
+# Push a specific tag to remote
+git push origin v1.0.0
+
+# Push all tags to remote
+git push origin --tags
+
+# Delete a local tag
+git tag -d v1.0.0
+
+# Delete a remote tag
+git push origin --delete v1.0.0
+```
+
+## 10. Branch Management
+
+### 10.1 Rename a Branch
 ```bash
 git branch -m oldname newname
 ```
 
-### 9.2 Switch to a Branch (Alternative to checkout)
+### 10.2 Switch to a Branch (Alternative to checkout)
 ```bash
 git switch branch-name
 ```
 
-## 10. Merging
+## 11. Merging
 
-### 10.1 Merge Branches
+### 11.1 Merge Branches
 This is normally done using a visual interface, but the command is available locally:
 ```bash
 git merge name-of-branch
@@ -541,9 +595,9 @@ main ---A---B---C (brancha merged)
                       M (merge commit)
 ```
 
-## 11. Rebasing
+## 12. Rebasing
 
-### 11.1 Git Rebase
+### 12.1 Git Rebase
 ```bash
 git rebase branch-name
 ```
@@ -556,11 +610,11 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## 12. Cherry-Picking Commits
+## 13. Cherry-Picking Commits
 
 Git cherry-pick allows you to apply specific commits from one branch to another without merging the entire branch. This is useful when you need just one or two commits from a feature branch.
 
-### 12.1 Basic Cherry-Pick
+### 13.1 Basic Cherry-Pick
 
 ```bash
 git cherry-pick COMMIT_HASH
@@ -576,7 +630,7 @@ git cherry-pick abc1234
 
 This creates a new commit on main with the same changes as commit abc1234, but with a different hash.
 
-### 12.2 Cherry-Pick Multiple Commits
+### 13.2 Cherry-Pick Multiple Commits
 
 ```bash
 # Cherry-pick multiple commits in sequence
@@ -596,7 +650,7 @@ git cherry-pick --continue
 git cherry-pick --abort
 ```
 
-### 12.3 When to Use Cherry-Pick
+### 13.3 When to Use Cherry-Pick
 
 **✅ Good use cases:**
 - Applying a bug fix from one branch to another
@@ -609,11 +663,11 @@ git cherry-pick --abort
 - Can make history confusing if overused
 - Better to merge entire branches when possible
 
-## 13. Squashing Commits
+## 14. Squashing Commits
 
 Squashing commits combines multiple commits into a single, cleaner commit. This is particularly useful in feature branch workflows where you want to present your work as one logical change rather than showing all the incremental development steps.
 
-### 13.1 Interactive Rebase for Squashing
+### 14.1 Interactive Rebase for Squashing
 
 **Interactive rebase** is the primary tool for squashing commits. It allows you to edit, combine, and reorder your commit history before merging into the main branch.
 
@@ -634,7 +688,7 @@ git rebase -i abc1234
 git rebase -i main
 ```
 
-### 13.2 Complete Squashing Workflow
+### 14.2 Complete Squashing Workflow
 
 #### Step-by-Step Feature Branch Squashing
 
@@ -683,7 +737,7 @@ squash def5678 Fix typo in validation message
 
 After saving and closing the editor, Git will prompt you to write a new commit message combining all the squashed commits.
 
-### 13.3 Squashing Options Explained
+### 14.3 Squashing Options Explained
 
 #### Pick vs Squash vs Fixup
 ```bash
@@ -718,7 +772,7 @@ squash ghi9012 Implement user input validation # This will combine with abc1234
 fixup def5678 Fix typo in validation message   # This fixes the combined commit
 ```
 
-### 13.4 When to Squash and When to Avoid
+### 14.4 When to Squash and When to Avoid
 
 #### ✅ Safe to Squash When:
 - Working on a feature branch that hasn't been shared with others
@@ -782,9 +836,9 @@ git reflog
 git reset --hard HEAD@{5}  # Reset to before the rebase
 ```
 
-## 14. Comparing Changes
+## 15. Comparing Changes
 
-### 14.1 Git Diff Between Branches
+### 15.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -802,15 +856,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## 15. Viewing History and Changes
+## 16. Viewing History and Changes
 
-### 15.1 Basic Commit History
+### 16.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### 15.2 Git Log Formatting Options
+### 16.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -836,7 +890,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### 15.3 Advanced Git Log Combinations
+### 16.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -856,7 +910,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### 15.4 Useful Log Filters
+### 16.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -876,11 +930,11 @@ git log --since="2 weeks ago" --until="yesterday"
 ```
 Shows commits within a specific time range.
 
-## 16. Data Recovery with Reflog
+## 17. Data Recovery with Reflog
 
 Git reflog (reference log) is a powerful recovery tool that tracks all changes to branch tips and HEAD in your local repository. Unlike git log, which shows committed history, reflog shows your navigation history - every checkout, commit, merge, rebase, and reset you've performed.
 
-### 16.1 Understanding Git Reflog
+### 17.1 Understanding Git Reflog
 
 **Git reflog** maintains a local history of where your HEAD and branch references have been, making it possible to recover "lost" commits and branches.
 
@@ -910,7 +964,7 @@ git reflog show branch-name         # Show reflog for specific branch
 - `commit:` - Type of action performed
 - `Add user authentication` - Description of the action
 
-### 16.2 Finding Lost Commits
+### 17.2 Finding Lost Commits
 
 #### Recover After Accidental Reset
 ```bash
@@ -942,7 +996,7 @@ git branch feature-branch-recovered def5678
 git checkout feature-branch-recovered
 ```
 
-### 16.3 Examining Objects with cat-file
+### 17.3 Examining Objects with cat-file
 
 **Git cat-file** is a low-level command that displays the raw content of Git objects (commits, trees, blobs). This is essential for detailed investigation when recovering data.
 
@@ -991,7 +1045,7 @@ git cat-file -s HASH              # Show object size
 git cat-file --batch-check        # Check multiple objects efficiently
 ```
 
-### 16.4 Complete Recovery Workflow
+### 17.4 Complete Recovery Workflow
 
 #### Step-by-Step Recovery Process
 Based on the provided recovery steps, here's the complete workflow:
@@ -1059,11 +1113,11 @@ git cat-file -p xyz7890 > recovered-payment.js
 - **Different repository**: Reflog is tied to your specific local repository
 
 
-## 17. Debugging with Bisect
+## 18. Debugging with Bisect
 
 Git bisect helps you find the commit that introduced a bug by performing a binary search through your commit history. This is especially useful when you know a feature worked before but is now broken.
 
-### 17.1 Basic Git Bisect
+### 18.1 Basic Git Bisect
 
 ```bash
 # Start bisecting
@@ -1078,7 +1132,7 @@ git bisect good COMMIT_HASH
 
 Git will then check out a commit halfway between good and bad for you to test.
 
-### 17.2 Bisect Workflow
+### 18.2 Bisect Workflow
 
 ```bash
 # 1. Start the bisect process
@@ -1101,7 +1155,7 @@ git bisect bad                    # If this commit has the bug
 git bisect reset
 ```
 
-### 17.3 When to Use Bisect
+### 18.3 When to Use Bisect
 
 **✅ Perfect for:**
 - Finding when a regression was introduced
@@ -1114,7 +1168,7 @@ git bisect reset
 - Testing requires complex setup
 - The codebase has frequent breaking changes in history
 
-## 18. Additional Resources
+## 19. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
