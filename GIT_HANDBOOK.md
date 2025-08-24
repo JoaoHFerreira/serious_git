@@ -336,5 +336,5 @@ Shows commits within a specific time range.
 ## 10. Additional Resources
 
 ### Video Tutorial
-[Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=2445)
+[Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
 
