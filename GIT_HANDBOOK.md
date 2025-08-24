@@ -27,19 +27,24 @@
    - 7.1 [Merge Branches](#71-merge-branches)
 8. [Rebasing](#8-rebasing)
    - 8.1 [Git Rebase](#81-git-rebase)
-9. [Comparing Changes](#9-comparing-changes)
-   - 9.1 [Git Diff Between Branches](#91-git-diff-between-branches)
-10. [Viewing History and Changes](#10-viewing-history-and-changes)
-   - 10.1 [Basic Commit History](#101-basic-commit-history)
-   - 10.2 [Git Log Formatting Options](#102-git-log-formatting-options)
-   - 10.3 [Advanced Git Log Combinations](#103-advanced-git-log-combinations)
-   - 10.4 [Useful Log Filters](#104-useful-log-filters)
-11. [Data Recovery with Reflog](#11-data-recovery-with-reflog)
-   - 11.1 [Understanding Git Reflog](#111-understanding-git-reflog)
-   - 11.2 [Finding Lost Commits](#112-finding-lost-commits)
-   - 11.3 [Examining Objects with cat-file](#113-examining-objects-with-cat-file)
-   - 11.4 [Complete Recovery Workflow](#114-complete-recovery-workflow)
-12. [Additional Resources](#12-additional-resources)
+9. [Squashing Commits](#9-squashing-commits)
+   - 9.1 [Interactive Rebase for Squashing](#91-interactive-rebase-for-squashing)
+   - 9.2 [Complete Squashing Workflow](#92-complete-squashing-workflow)
+   - 9.3 [Squashing Options Explained](#93-squashing-options-explained)
+   - 9.4 [When to Squash and When to Avoid](#94-when-to-squash-and-when-to-avoid)
+10. [Comparing Changes](#10-comparing-changes)
+   - 10.1 [Git Diff Between Branches](#101-git-diff-between-branches)
+11. [Viewing History and Changes](#11-viewing-history-and-changes)
+   - 11.1 [Basic Commit History](#111-basic-commit-history)
+   - 11.2 [Git Log Formatting Options](#112-git-log-formatting-options)
+   - 11.3 [Advanced Git Log Combinations](#113-advanced-git-log-combinations)
+   - 11.4 [Useful Log Filters](#114-useful-log-filters)
+12. [Data Recovery with Reflog](#12-data-recovery-with-reflog)
+   - 12.1 [Understanding Git Reflog](#121-understanding-git-reflog)
+   - 12.2 [Finding Lost Commits](#122-finding-lost-commits)
+   - 12.3 [Examining Objects with cat-file](#123-examining-objects-with-cat-file)
+   - 12.4 [Complete Recovery Workflow](#124-complete-recovery-workflow)
+13. [Additional Resources](#13-additional-resources)
 
 ## 1. Configuration
 
@@ -361,9 +366,182 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## 9. Comparing Changes
+## 9. Squashing Commits
 
-### 9.1 Git Diff Between Branches
+Squashing commits combines multiple commits into a single, cleaner commit. This is particularly useful in feature branch workflows where you want to present your work as one logical change rather than showing all the incremental development steps.
+
+### 9.1 Interactive Rebase for Squashing
+
+**Interactive rebase** is the primary tool for squashing commits. It allows you to edit, combine, and reorder your commit history before merging into the main branch.
+
+```bash
+git rebase -i HEAD~NUMBER_OF_COMMITS
+```
+Opens an interactive editor where you can choose which commits to squash together.
+
+#### Basic Interactive Rebase Syntax
+```bash
+# Squash the last 3 commits together  
+git rebase -i HEAD~3
+
+# Squash commits back to a specific commit hash
+git rebase -i abc1234
+
+# Squash all commits in your feature branch (if branched from main)
+git rebase -i main
+```
+
+### 9.2 Complete Squashing Workflow
+
+#### Step-by-Step Feature Branch Squashing
+
+```bash
+# You're on a feature branch with multiple commits
+# First, check how many commits you want to squash
+git log --oneline
+
+# Let's say you see 4 commits you want to combine:
+# def5678 Fix typo in validation message  
+# abc1234 Add input validation tests
+# ghi9012 Implement user input validation  
+# jkl3456 Add validation utility functions
+
+# Start interactive rebase for the last 4 commits
+git rebase -i HEAD~4
+```
+
+#### Understanding the Interactive Rebase Interface
+When you run `git rebase -i HEAD~4`, Git opens your editor with:
+
+```bash
+pick jkl3456 Add validation utility functions
+pick ghi9012 Implement user input validation
+pick abc1234 Add input validation tests  
+pick def5678 Fix typo in validation message
+
+# Rebase instructions appear below:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+```
+
+#### Typical Squashing Configuration
+```bash
+# Keep the first commit and squash the others into it
+pick jkl3456 Add validation utility functions
+squash ghi9012 Implement user input validation  
+squash abc1234 Add input validation tests
+squash def5678 Fix typo in validation message
+```
+
+After saving and closing the editor, Git will prompt you to write a new commit message combining all the squashed commits.
+
+### 9.3 Squashing Options Explained
+
+#### Pick vs Squash vs Fixup
+```bash
+pick    # Keep this commit as-is
+squash  # Combine with previous commit, keep both commit messages  
+fixup   # Combine with previous commit, discard this commit's message
+```
+
+#### Advanced Squashing Scenarios
+
+**Squash only some commits:**
+```bash
+pick jkl3456 Add validation utility functions
+pick ghi9012 Implement user input validation
+squash abc1234 Add input validation tests     # Combine with ghi9012
+squash def5678 Fix typo in validation message # Combine with ghi9012
+```
+
+**Use fixup for obvious fixes:**
+```bash
+pick jkl3456 Add validation utility functions  
+pick ghi9012 Implement user input validation
+pick abc1234 Add input validation tests
+fixup def5678 Fix typo in validation message   # Just fix ghi9012, no message
+```
+
+**Reorder and squash:**
+```bash
+pick jkl3456 Add validation utility functions
+pick abc1234 Add input validation tests  
+squash ghi9012 Implement user input validation # This will combine with abc1234
+fixup def5678 Fix typo in validation message   # This fixes the combined commit
+```
+
+### 9.4 When to Squash and When to Avoid
+
+#### ✅ Safe to Squash When:
+- Working on a feature branch that hasn't been shared with others
+- You have multiple "work in progress" or "fix typo" commits
+- Preparing a clean history before merging to main branch
+- Each individual commit doesn't add meaningful value to the project history
+- You want to present your feature as one logical unit of work
+
+#### ⚠️ Use with Caution When:
+- The feature branch has been pushed and others might have based work on it
+- Each commit represents a distinct, valuable piece of work
+- You're working with teammates who expect to see detailed development history
+- Some commits might need to be cherry-picked individually later
+
+#### ❌ Avoid Squashing When:
+- Working directly on shared branches (main, develop)
+- The commits have already been merged into main branch
+- Each commit fixes a different bug that might need individual tracking
+- Team policy requires preserving detailed commit history
+- Commits span multiple logical features that should remain separate
+
+#### Alternative: Squash Merge
+Instead of interactive rebase, you can use squash merge when merging your PR:
+```bash
+# When merging a pull request, use squash merge
+git checkout main
+git merge --squash feature-branch
+git commit -m "Add complete user input validation system"
+```
+
+#### ❌ Common Mistakes to Avoid
+
+**Never squash published commits:**
+```bash
+# BAD: Don't do this if the branch is shared
+git rebase -i HEAD~5  # If these commits are already pushed and others pulled them
+```
+
+**Don't squash unrelated features:**
+```bash
+# BAD: These should be separate commits
+pick abc1234 Add user authentication
+squash def5678 Fix database connection bug  # Unrelated to authentication!
+```
+
+**Always backup before major squashing:**
+```bash
+# Create a backup branch before squashing
+git branch feature-backup
+git rebase -i HEAD~10
+```
+
+#### Recovery from Squashing Mistakes
+If you mess up during interactive rebase:
+```bash
+# Abort the rebase and return to original state
+git rebase --abort
+
+# Or use reflog to recover (see section 12)
+git reflog
+git reset --hard HEAD@{5}  # Reset to before the rebase
+```
+
+## 10. Comparing Changes
+
+### 10.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -381,15 +559,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## 10. Viewing History and Changes
+## 11. Viewing History and Changes
 
-### 10.1 Basic Commit History
+### 11.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### 10.2 Git Log Formatting Options
+### 11.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -415,7 +593,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### 10.3 Advanced Git Log Combinations
+### 11.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -435,7 +613,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### 10.4 Useful Log Filters
+### 11.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -455,11 +633,11 @@ git log --since="2 weeks ago" --until="yesterday"
 ```
 Shows commits within a specific time range.
 
-## 11. Data Recovery with Reflog
+## 12. Data Recovery with Reflog
 
 Git reflog (reference log) is a powerful recovery tool that tracks all changes to branch tips and HEAD in your local repository. Unlike git log, which shows committed history, reflog shows your navigation history - every checkout, commit, merge, rebase, and reset you've performed.
 
-### 11.1 Understanding Git Reflog
+### 12.1 Understanding Git Reflog
 
 **Git reflog** maintains a local history of where your HEAD and branch references have been, making it possible to recover "lost" commits and branches.
 
@@ -489,7 +667,7 @@ git reflog show branch-name         # Show reflog for specific branch
 - `commit:` - Type of action performed
 - `Add user authentication` - Description of the action
 
-### 11.2 Finding Lost Commits
+### 12.2 Finding Lost Commits
 
 #### Recover After Accidental Reset
 ```bash
@@ -521,7 +699,7 @@ git branch feature-branch-recovered def5678
 git checkout feature-branch-recovered
 ```
 
-### 11.3 Examining Objects with cat-file
+### 12.3 Examining Objects with cat-file
 
 **Git cat-file** is a low-level command that displays the raw content of Git objects (commits, trees, blobs). This is essential for detailed investigation when recovering data.
 
@@ -570,7 +748,7 @@ git cat-file -s HASH              # Show object size
 git cat-file --batch-check        # Check multiple objects efficiently
 ```
 
-### 11.4 Complete Recovery Workflow
+### 12.4 Complete Recovery Workflow
 
 #### Step-by-Step Recovery Process
 Based on the provided recovery steps, here's the complete workflow:
@@ -638,7 +816,7 @@ git cat-file -p xyz7890 > recovered-payment.js
 - **Different repository**: Reflog is tied to your specific local repository
 
 
-## 12. Additional Resources
+## 13. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
