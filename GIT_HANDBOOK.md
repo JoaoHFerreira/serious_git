@@ -1,5 +1,7 @@
 # Git Reference Guide
 
+Summary from the learning [Git Tutorial Video](https://www.youtube.com/watch?v=rH3zE7VlIMs)
+
 ## Table of Contents
 
 1. [Configuration](#1-configuration)
@@ -1168,7 +1170,4 @@ git bisect reset
 - Testing requires complex setup
 - The codebase has frequent breaking changes in history
 
-## 19. Additional Resources
 
-### Video Tutorial
-[Git Tutorial Video](https://www.youtube.com/watch?v=rH3zE7VlIMs)
