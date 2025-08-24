@@ -11,40 +11,44 @@
    - 3.1 [Git Restore vs Git Reset - Key Differences](#31-git-restore-vs-git-reset---key-differences)
    - 3.2 [When to Use Each](#32-when-to-use-each)
    - 3.3 [Reset Target Options](#33-reset-target-options)
-4. [Amending Commits](#4-amending-commits)
-   - 4.1 [Basic Amend Usage](#41-basic-amend-usage)
-   - 4.2 [Amending Commit Messages](#42-amending-commit-messages)
-   - 4.3 [Adding Files to Last Commit](#43-adding-files-to-last-commit)
-   - 4.4 [When to Use and When to Avoid](#44-when-to-use-and-when-to-avoid)
-5. [Remote Repositories](#5-remote-repositories)
-   - 5.1 [Adding Remote Origins](#51-adding-remote-origins)
-   - 5.2 [Remote to Local Folder](#52-remote-to-local-folder)
-   - 5.3 [Working with Remotes](#53-working-with-remotes)
-6. [Branch Management](#6-branch-management)
-   - 6.1 [Rename a Branch](#61-rename-a-branch)
-   - 6.2 [Switch to a Branch (Alternative to checkout)](#62-switch-to-a-branch-alternative-to-checkout)
-7. [Merging](#7-merging)
-   - 7.1 [Merge Branches](#71-merge-branches)
-8. [Rebasing](#8-rebasing)
-   - 8.1 [Git Rebase](#81-git-rebase)
-9. [Squashing Commits](#9-squashing-commits)
-   - 9.1 [Interactive Rebase for Squashing](#91-interactive-rebase-for-squashing)
-   - 9.2 [Complete Squashing Workflow](#92-complete-squashing-workflow)
-   - 9.3 [Squashing Options Explained](#93-squashing-options-explained)
-   - 9.4 [When to Squash and When to Avoid](#94-when-to-squash-and-when-to-avoid)
-10. [Comparing Changes](#10-comparing-changes)
-   - 10.1 [Git Diff Between Branches](#101-git-diff-between-branches)
-11. [Viewing History and Changes](#11-viewing-history-and-changes)
-   - 11.1 [Basic Commit History](#111-basic-commit-history)
-   - 11.2 [Git Log Formatting Options](#112-git-log-formatting-options)
-   - 11.3 [Advanced Git Log Combinations](#113-advanced-git-log-combinations)
-   - 11.4 [Useful Log Filters](#114-useful-log-filters)
-12. [Data Recovery with Reflog](#12-data-recovery-with-reflog)
-   - 12.1 [Understanding Git Reflog](#121-understanding-git-reflog)
-   - 12.2 [Finding Lost Commits](#122-finding-lost-commits)
-   - 12.3 [Examining Objects with cat-file](#123-examining-objects-with-cat-file)
-   - 12.4 [Complete Recovery Workflow](#124-complete-recovery-workflow)
-13. [Additional Resources](#13-additional-resources)
+4. [Stashing Changes](#4-stashing-changes)
+   - 4.1 [Basic Git Stash](#41-basic-git-stash)
+   - 4.2 [Viewing Stashed Changes](#42-viewing-stashed-changes)
+   - 4.3 [Applying Stashed Changes](#43-applying-stashed-changes)
+5. [Amending Commits](#5-amending-commits)
+   - 5.1 [Basic Amend Usage](#51-basic-amend-usage)
+   - 5.2 [Amending Commit Messages](#52-amending-commit-messages)
+   - 5.3 [Adding Files to Last Commit](#53-adding-files-to-last-commit)
+   - 5.4 [When to Use and When to Avoid](#54-when-to-use-and-when-to-avoid)
+6. [Remote Repositories](#6-remote-repositories)
+   - 6.1 [Adding Remote Origins](#61-adding-remote-origins)
+   - 6.2 [Remote to Local Folder](#62-remote-to-local-folder)
+   - 6.3 [Working with Remotes](#63-working-with-remotes)
+7. [Branch Management](#7-branch-management)
+   - 7.1 [Rename a Branch](#71-rename-a-branch)
+   - 7.2 [Switch to a Branch (Alternative to checkout)](#72-switch-to-a-branch-alternative-to-checkout)
+8. [Merging](#8-merging)
+   - 8.1 [Merge Branches](#81-merge-branches)
+9. [Rebasing](#9-rebasing)
+   - 9.1 [Git Rebase](#91-git-rebase)
+10. [Squashing Commits](#10-squashing-commits)
+   - 10.1 [Interactive Rebase for Squashing](#101-interactive-rebase-for-squashing)
+   - 10.2 [Complete Squashing Workflow](#102-complete-squashing-workflow)
+   - 10.3 [Squashing Options Explained](#103-squashing-options-explained)
+   - 10.4 [When to Squash and When to Avoid](#104-when-to-squash-and-when-to-avoid)
+11. [Comparing Changes](#11-comparing-changes)
+   - 11.1 [Git Diff Between Branches](#111-git-diff-between-branches)
+12. [Viewing History and Changes](#12-viewing-history-and-changes)
+   - 12.1 [Basic Commit History](#121-basic-commit-history)
+   - 12.2 [Git Log Formatting Options](#122-git-log-formatting-options)
+   - 12.3 [Advanced Git Log Combinations](#123-advanced-git-log-combinations)
+   - 12.4 [Useful Log Filters](#124-useful-log-filters)
+13. [Data Recovery with Reflog](#13-data-recovery-with-reflog)
+   - 13.1 [Understanding Git Reflog](#131-understanding-git-reflog)
+   - 13.2 [Finding Lost Commits](#132-finding-lost-commits)
+   - 13.3 [Examining Objects with cat-file](#133-examining-objects-with-cat-file)
+   - 13.4 [Complete Recovery Workflow](#134-complete-recovery-workflow)
+14. [Additional Resources](#14-additional-resources)
 
 ## 1. Configuration
 
@@ -172,9 +176,65 @@ git reset --soft abc1234
 git reset --hard abc1234
 ```
 
-## 4. Amending Commits
+## 4. Stashing Changes
 
-### 4.1 Basic Amend Usage
+Git stash temporarily saves your uncommitted work (both staged and unstaged changes) so you can switch branches or pull updates without committing incomplete work.
+
+### 4.1 Basic Git Stash
+
+```bash
+git stash
+```
+Saves all your current changes and reverts your working directory to match the HEAD commit. Your changes are stored in a "stash" for later retrieval.
+
+**What gets stashed:**
+- All tracked files with modifications
+- Files in the staging area
+
+**What doesn't get stashed:**
+- Untracked files (new files not yet added to git)
+- Files listed in .gitignore
+
+### 4.2 Viewing Stashed Changes
+
+```bash
+git stash list
+```
+Shows all your stashed changes with stash references and descriptions.
+
+**Example output:**
+```bash
+stash@{0}: WIP on main: 1a2b3c4 Add user login feature
+stash@{1}: WIP on feature-branch: 5d6e7f8 Update navigation
+```
+
+Each stash entry shows:
+- `stash@{0}` - Stash reference (0 = most recent)
+- `WIP on main` - "Work In Progress" on the main branch
+- `1a2b3c4 Add user login feature` - The commit you were working from
+
+### 4.3 Applying Stashed Changes
+
+```bash
+git stash pop
+```
+Applies the most recent stash (`stash@{0}`) to your current working directory and removes it from the stash list.
+
+**Alternative:**
+```bash
+git stash apply
+```
+Applies the stash but keeps it in the stash list (useful if you want to apply the same changes to multiple branches).
+
+**Apply specific stash:**
+```bash
+git stash pop stash@{1}    # Apply and remove specific stash
+git stash apply stash@{1}  # Apply specific stash but keep it
+```
+
+## 5. Amending Commits
+
+### 5.1 Basic Amend Usage
 
 **Git commit --amend** allows you to modify the most recent commit without creating a new commit. This is useful for fixing mistakes in your last commit.
 
@@ -184,7 +244,7 @@ git commit --amend
 
 This command opens your default text editor to modify the commit message and includes any currently staged changes into the last commit.
 
-### 4.2 Amending Commit Messages
+### 5.2 Amending Commit Messages
 
 #### Change Only the Commit Message
 ```bash
@@ -198,7 +258,7 @@ git commit --amend
 ```
 Opens your default editor to modify the commit message. The existing message will be pre-loaded for editing.
 
-### 4.3 Adding Files to Last Commit
+### 5.3 Adding Files to Last Commit
 
 #### Add Forgotten Files
 ```bash
@@ -225,7 +285,7 @@ git add styles/auth.css
 git commit --amend --no-edit
 ```
 
-### 4.4 When to Use and When to Avoid
+### 5.4 When to Use and When to Avoid
 
 #### ✅ Safe to Use When:
 - The commit hasn't been pushed to a remote repository yet
@@ -258,9 +318,9 @@ git add forgotten-file.txt
 git commit -m "Add forgotten authentication styles"
 ```
 
-## 5. Remote Repositories
+## 6. Remote Repositories
 
-### 5.1 Adding Remote Origins
+### 6.1 Adding Remote Origins
 
 #### Connect to Remote Server (GitHub, GitLab, etc.)
 ```bash
@@ -280,7 +340,7 @@ git remote add origin ../another-project/.git
 - Sharing code between local projects
 - Learning git without needing internet access
 
-### 5.2 Remote to Local Folder
+### 6.2 Remote to Local Folder
 
 #### Example: Setting Up Local Remote
 ```bash
@@ -301,7 +361,7 @@ git clone /path/to/source/repo /path/to/destination/repo
 git clone ../existing-project new-project-copy
 ```
 
-### 5.3 Working with Remotes
+### 6.3 Working with Remotes
 
 #### View Remote Connections
 ```bash
@@ -322,21 +382,21 @@ git remote remove origin        # Remove remote connection
 git remote rename origin backup  # Rename remote
 ```
 
-## 6. Branch Management
+## 7. Branch Management
 
-### 6.1 Rename a Branch
+### 7.1 Rename a Branch
 ```bash
 git branch -m oldname newname
 ```
 
-### 6.2 Switch to a Branch (Alternative to checkout)
+### 7.2 Switch to a Branch (Alternative to checkout)
 ```bash
 git switch branch-name
 ```
 
-## 7. Merging
+## 8. Merging
 
-### 7.1 Merge Branches
+### 8.1 Merge Branches
 This is normally done using a visual interface, but the command is available locally:
 ```bash
 git merge name-of-branch
@@ -351,9 +411,9 @@ main ---A---B---C (brancha merged)
                       M (merge commit)
 ```
 
-## 8. Rebasing
+## 9. Rebasing
 
-### 8.1 Git Rebase
+### 9.1 Git Rebase
 ```bash
 git rebase branch-name
 ```
@@ -366,11 +426,11 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## 9. Squashing Commits
+## 10. Squashing Commits
 
 Squashing commits combines multiple commits into a single, cleaner commit. This is particularly useful in feature branch workflows where you want to present your work as one logical change rather than showing all the incremental development steps.
 
-### 9.1 Interactive Rebase for Squashing
+### 10.1 Interactive Rebase for Squashing
 
 **Interactive rebase** is the primary tool for squashing commits. It allows you to edit, combine, and reorder your commit history before merging into the main branch.
 
@@ -391,7 +451,7 @@ git rebase -i abc1234
 git rebase -i main
 ```
 
-### 9.2 Complete Squashing Workflow
+### 10.2 Complete Squashing Workflow
 
 #### Step-by-Step Feature Branch Squashing
 
@@ -440,7 +500,7 @@ squash def5678 Fix typo in validation message
 
 After saving and closing the editor, Git will prompt you to write a new commit message combining all the squashed commits.
 
-### 9.3 Squashing Options Explained
+### 10.3 Squashing Options Explained
 
 #### Pick vs Squash vs Fixup
 ```bash
@@ -475,7 +535,7 @@ squash ghi9012 Implement user input validation # This will combine with abc1234
 fixup def5678 Fix typo in validation message   # This fixes the combined commit
 ```
 
-### 9.4 When to Squash and When to Avoid
+### 10.4 When to Squash and When to Avoid
 
 #### ✅ Safe to Squash When:
 - Working on a feature branch that hasn't been shared with others
@@ -539,9 +599,9 @@ git reflog
 git reset --hard HEAD@{5}  # Reset to before the rebase
 ```
 
-## 10. Comparing Changes
+## 11. Comparing Changes
 
-### 10.1 Git Diff Between Branches
+### 11.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -559,15 +619,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## 11. Viewing History and Changes
+## 12. Viewing History and Changes
 
-### 11.1 Basic Commit History
+### 12.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### 11.2 Git Log Formatting Options
+### 12.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -593,7 +653,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### 11.3 Advanced Git Log Combinations
+### 12.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -613,7 +673,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### 11.4 Useful Log Filters
+### 12.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -633,11 +693,11 @@ git log --since="2 weeks ago" --until="yesterday"
 ```
 Shows commits within a specific time range.
 
-## 12. Data Recovery with Reflog
+## 13. Data Recovery with Reflog
 
 Git reflog (reference log) is a powerful recovery tool that tracks all changes to branch tips and HEAD in your local repository. Unlike git log, which shows committed history, reflog shows your navigation history - every checkout, commit, merge, rebase, and reset you've performed.
 
-### 12.1 Understanding Git Reflog
+### 13.1 Understanding Git Reflog
 
 **Git reflog** maintains a local history of where your HEAD and branch references have been, making it possible to recover "lost" commits and branches.
 
@@ -667,7 +727,7 @@ git reflog show branch-name         # Show reflog for specific branch
 - `commit:` - Type of action performed
 - `Add user authentication` - Description of the action
 
-### 12.2 Finding Lost Commits
+### 13.2 Finding Lost Commits
 
 #### Recover After Accidental Reset
 ```bash
@@ -699,7 +759,7 @@ git branch feature-branch-recovered def5678
 git checkout feature-branch-recovered
 ```
 
-### 12.3 Examining Objects with cat-file
+### 13.3 Examining Objects with cat-file
 
 **Git cat-file** is a low-level command that displays the raw content of Git objects (commits, trees, blobs). This is essential for detailed investigation when recovering data.
 
@@ -748,7 +808,7 @@ git cat-file -s HASH              # Show object size
 git cat-file --batch-check        # Check multiple objects efficiently
 ```
 
-### 12.4 Complete Recovery Workflow
+### 13.4 Complete Recovery Workflow
 
 #### Step-by-Step Recovery Process
 Based on the provided recovery steps, here's the complete workflow:
@@ -816,7 +876,7 @@ git cat-file -p xyz7890 > recovered-payment.js
 - **Different repository**: Reflog is tied to your specific local repository
 
 
-## 13. Additional Resources
+## 14. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
