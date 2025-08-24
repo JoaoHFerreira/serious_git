@@ -1171,5 +1171,4 @@ git bisect reset
 ## 19. Additional Resources
 
 ### Video Tutorial
-[Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
-
+[Git Tutorial Video](https://www.youtube.com/watch?v=rH3zE7VlIMs)
