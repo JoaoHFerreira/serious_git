@@ -1,1 +1,2 @@
 simple
+3. Use 'git cat-file -p commit-hash' in the 'tree' hash , since this will contain the dirs changes
