@@ -1,0 +1,98 @@
+Nice choice 👍 — `git worktree` is very handy but underused. Let’s make a **simple exercise** so you can see how it works in practice.
+
+---
+
+# 📝 Exercise: Use `git worktree` to work on multiple branches simultaneously
+
+## 🔹 Setup
+
+1. Create a new repo:
+
+   ```bash
+   mkdir worktree-demo && cd worktree-demo
+   git init
+   echo "Main branch file" > file.txt
+   git add file.txt
+   git commit -m "Initial commit on main"
+   ```
+
+2. Create a new branch:
+
+   ```bash
+   git branch feature
+   ```
+
+---
+
+## 🔹 Task
+
+Your job: use **worktrees** so you can work on both `main` and `feature` branches in separate directories at the same time.
+
+1. Add a worktree for the `feature` branch:
+
+   ```bash
+   git worktree add ../worktree-feature feature
+   ```
+
+   ✅ This creates a new folder `../worktree-feature` checked out at branch `feature`.
+
+2. Go into the worktree:
+
+   ```bash
+   cd ../worktree-feature
+   ```
+
+   Verify branch:
+
+   ```bash
+   git status
+   ```
+
+   You should see:
+
+   ```
+   On branch feature
+   ```
+
+3. Make a commit in the worktree (`feature` branch):
+
+   ```bash
+   echo "Feature branch file" > feature.txt
+   git add feature.txt
+   git commit -m "Add feature.txt in feature branch"
+   ```
+
+4. Switch back to the main project folder:
+
+   ```bash
+   cd ../worktree-demo
+   git log --oneline
+   ```
+
+   Notice you are still on `main` with no `feature.txt`.
+
+---
+
+## 🔹 Success criteria
+
+* You have **two directories**:
+
+  * `worktree-demo` → `main` branch
+  * `worktree-feature` → `feature` branch
+* Each folder shows different contents.
+* You can commit independently in each one without constantly switching branches.
+
+---
+
+⚡ Bonus challenge:
+
+* Run `git worktree list` to see all active worktrees.
+* When done, remove the worktree:
+
+  ```bash
+  git worktree remove ../worktree-feature
+  ```
+
+---
+
+Do you want me to also create a **team workflow exercise** where you use `worktree` to handle a hotfix branch while keeping your feature branch open?
