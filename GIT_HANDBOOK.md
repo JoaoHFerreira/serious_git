@@ -34,7 +34,12 @@
    - 10.2 [Git Log Formatting Options](#102-git-log-formatting-options)
    - 10.3 [Advanced Git Log Combinations](#103-advanced-git-log-combinations)
    - 10.4 [Useful Log Filters](#104-useful-log-filters)
-11. [Additional Resources](#11-additional-resources)
+11. [Data Recovery with Reflog](#11-data-recovery-with-reflog)
+   - 11.1 [Understanding Git Reflog](#111-understanding-git-reflog)
+   - 11.2 [Finding Lost Commits](#112-finding-lost-commits)
+   - 11.3 [Examining Objects with cat-file](#113-examining-objects-with-cat-file)
+   - 11.4 [Complete Recovery Workflow](#114-complete-recovery-workflow)
+12. [Additional Resources](#12-additional-resources)
 
 ## 1. Configuration
 
@@ -450,8 +455,190 @@ git log --since="2 weeks ago" --until="yesterday"
 ```
 Shows commits within a specific time range.
 
+## 11. Data Recovery with Reflog
 
-## 11. Additional Resources
+Git reflog (reference log) is a powerful recovery tool that tracks all changes to branch tips and HEAD in your local repository. Unlike git log, which shows committed history, reflog shows your navigation history - every checkout, commit, merge, rebase, and reset you've performed.
+
+### 11.1 Understanding Git Reflog
+
+**Git reflog** maintains a local history of where your HEAD and branch references have been, making it possible to recover "lost" commits and branches.
+
+```bash
+git reflog
+```
+Shows your recent actions with abbreviated commit hashes and action descriptions.
+
+#### Detailed Reflog Information
+```bash
+git reflog --all                    # Show reflog for all references
+git reflog show HEAD                # Show reflog for HEAD specifically
+git reflog show branch-name         # Show reflog for specific branch
+```
+
+#### Understanding Reflog Output
+```bash
+# Example reflog output:
+# abc1234 (HEAD@{0}) HEAD@{0}: commit: Add user authentication
+# def5678 (HEAD@{1}) HEAD@{1}: checkout: moving from main to feature-branch  
+# ghi9012 (HEAD@{2}) HEAD@{2}: reset: moving to HEAD~1
+```
+
+**Reflog entries explained:**
+- `abc1234` - Commit hash  
+- `HEAD@{0}` - Most recent action (0 = now, 1 = one step back, etc.)
+- `commit:` - Type of action performed
+- `Add user authentication` - Description of the action
+
+### 11.2 Finding Lost Commits
+
+#### Recover After Accidental Reset
+```bash
+# You accidentally did: git reset --hard HEAD~3
+# First, check what you lost
+git reflog
+
+# Find the commit you want to recover (before the reset)
+# Let's say it shows: abc1234 HEAD@{1}: commit: Important feature
+
+# Recover by resetting to that commit
+git reset --hard abc1234
+# or use the reflog reference directly
+git reset --hard HEAD@{1}
+```
+
+#### Recover Deleted Branch
+```bash
+# You accidentally deleted a branch: git branch -D feature-branch
+# First, find the last commit of that branch in reflog
+git reflog
+
+# Look for entries like: "checkout: moving from feature-branch to main"
+# The commit before that checkout is your branch's last commit
+# Let's say it shows: def5678 HEAD@{3}: commit: Feature complete
+
+# Recreate the branch at that commit
+git branch feature-branch-recovered def5678
+git checkout feature-branch-recovered
+```
+
+### 11.3 Examining Objects with cat-file
+
+**Git cat-file** is a low-level command that displays the raw content of Git objects (commits, trees, blobs). This is essential for detailed investigation when recovering data.
+
+```bash
+git cat-file -p COMMIT_HASH
+```
+Shows the complete content of a commit object including metadata and parent relationships.
+
+#### Understanding Commit Objects
+```bash
+# Example: Examine a specific commit
+git cat-file -p abc1234
+
+# Output shows:
+# tree def5678abc...           # Points to the tree (directory structure)
+# parent ghi9012def...         # Parent commit(s)  
+# author John Doe <john@example.com> 1642780800 +0000
+# committer John Doe <john@example.com> 1642780800 +0000
+#
+# Add user authentication feature
+```
+
+#### Examining Tree Objects
+```bash
+# Use the tree hash from the commit to see directory structure
+git cat-file -p def5678abc
+
+# Output shows files and subdirectories:
+# 100644 blob jkl3456... README.md
+# 100644 blob mno7890... package.json  
+# 040000 tree pqr1234... src/
+```
+
+#### Examining File Content (Blobs)
+```bash
+# Use the blob hash to see actual file content
+git cat-file -p jkl3456
+
+# Shows the actual content of README.md at that commit
+```
+
+#### Useful cat-file Options
+```bash
+git cat-file -t HASH              # Show object type (commit, tree, blob, tag)
+git cat-file -s HASH              # Show object size
+git cat-file --batch-check        # Check multiple objects efficiently
+```
+
+### 11.4 Complete Recovery Workflow
+
+#### Step-by-Step Recovery Process
+Based on the provided recovery steps, here's the complete workflow:
+
+```bash
+# Step 1: Use git reflog to identify the target commit
+git reflog
+# Look for the commit message related to the change you want to retrieve
+# Example output: abc1234 HEAD@{5}: commit: Important feature implementation
+
+# Step 2: Examine the commit object completely  
+git cat-file -p abc1234
+# This shows the tree hash and commit metadata
+# Example output shows: tree def5678...
+
+# Step 3: Examine the tree to see directory changes
+git cat-file -p def5678  
+# This shows all files and subdirectories at that commit
+# Look for the specific file hash you need
+# Example: 100644 blob ghi9012... important-file.js
+
+# Step 4: Retrieve the actual file content
+git cat-file -p ghi9012
+# This shows the complete file content as it existed in that commit
+```
+
+#### Practical Recovery Example
+```bash
+# Scenario: You lost changes after a bad merge and need to recover specific files
+
+# Find the commit before the bad merge
+git reflog | grep "merge\|commit"
+# Shows: def5678 HEAD@{3}: commit: Add payment processing
+
+# Examine that commit's structure  
+git cat-file -p def5678
+# Output: tree abc1234...
+
+# Check what files were in that tree
+git cat-file -p abc1234
+# Shows: 100644 blob xyz7890... src/payment.js  
+
+# Recover the specific file content
+git cat-file -p xyz7890 > recovered-payment.js
+```
+
+#### ✅ Safe Recovery Practices
+
+- **Always examine before recovering**: Use `git cat-file -p` to verify content before restoration
+- **Work on a backup branch**: Create a new branch for recovery attempts
+- **Document your steps**: Keep track of commit hashes and recovery commands
+- **Verify integrity**: Compare recovered files with expected content
+
+#### ⚠️ Important Limitations
+
+- **Reflog is local only**: It doesn't sync with remotes, only tracks your local actions
+- **Limited retention**: Reflog entries expire (default 90 days for reachable commits)
+- **Repository-specific**: Each clone has its own reflog history
+
+#### ❌ When Recovery Isn't Possible
+
+- **After git gc --prune**: Unreachable objects may be permanently deleted
+- **On fresh clones**: Reflog doesn't transfer from remotes  
+- **Very old changes**: Beyond reflog retention period
+- **Different repository**: Reflog is tied to your specific local repository
+
+
+## 12. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
