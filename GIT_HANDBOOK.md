@@ -11,25 +11,30 @@
    - 3.1 [Git Restore vs Git Reset - Key Differences](#31-git-restore-vs-git-reset---key-differences)
    - 3.2 [When to Use Each](#32-when-to-use-each)
    - 3.3 [Reset Target Options](#33-reset-target-options)
-4. [Remote Repositories](#4-remote-repositories)
-   - 4.1 [Adding Remote Origins](#41-adding-remote-origins)
-   - 4.2 [Remote to Local Folder](#42-remote-to-local-folder)
-   - 4.3 [Working with Remotes](#43-working-with-remotes)
-5. [Branch Management](#5-branch-management)
-   - 5.1 [Rename a Branch](#51-rename-a-branch)
-   - 5.2 [Switch to a Branch (Alternative to checkout)](#52-switch-to-a-branch-alternative-to-checkout)
-6. [Merging](#6-merging)
-   - 6.1 [Merge Branches](#61-merge-branches)
-7. [Rebasing](#7-rebasing)
-   - 7.1 [Git Rebase](#71-git-rebase)
-8. [Comparing Changes](#8-comparing-changes)
-   - 8.1 [Git Diff Between Branches](#81-git-diff-between-branches)
-9. [Viewing History and Changes](#9-viewing-history-and-changes)
-   - 9.1 [Basic Commit History](#91-basic-commit-history)
-   - 9.2 [Git Log Formatting Options](#92-git-log-formatting-options)
-   - 9.3 [Advanced Git Log Combinations](#93-advanced-git-log-combinations)
-   - 9.4 [Useful Log Filters](#94-useful-log-filters)
-10. [Additional Resources](#10-additional-resources)
+4. [Amending Commits](#4-amending-commits)
+   - 4.1 [Basic Amend Usage](#41-basic-amend-usage)
+   - 4.2 [Amending Commit Messages](#42-amending-commit-messages)
+   - 4.3 [Adding Files to Last Commit](#43-adding-files-to-last-commit)
+   - 4.4 [When to Use and When to Avoid](#44-when-to-use-and-when-to-avoid)
+5. [Remote Repositories](#5-remote-repositories)
+   - 5.1 [Adding Remote Origins](#51-adding-remote-origins)
+   - 5.2 [Remote to Local Folder](#52-remote-to-local-folder)
+   - 5.3 [Working with Remotes](#53-working-with-remotes)
+6. [Branch Management](#6-branch-management)
+   - 6.1 [Rename a Branch](#61-rename-a-branch)
+   - 6.2 [Switch to a Branch (Alternative to checkout)](#62-switch-to-a-branch-alternative-to-checkout)
+7. [Merging](#7-merging)
+   - 7.1 [Merge Branches](#71-merge-branches)
+8. [Rebasing](#8-rebasing)
+   - 8.1 [Git Rebase](#81-git-rebase)
+9. [Comparing Changes](#9-comparing-changes)
+   - 9.1 [Git Diff Between Branches](#91-git-diff-between-branches)
+10. [Viewing History and Changes](#10-viewing-history-and-changes)
+   - 10.1 [Basic Commit History](#101-basic-commit-history)
+   - 10.2 [Git Log Formatting Options](#102-git-log-formatting-options)
+   - 10.3 [Advanced Git Log Combinations](#103-advanced-git-log-combinations)
+   - 10.4 [Useful Log Filters](#104-useful-log-filters)
+11. [Additional Resources](#11-additional-resources)
 
 ## 1. Configuration
 
@@ -157,9 +162,95 @@ git reset --soft abc1234
 git reset --hard abc1234
 ```
 
-## 4. Remote Repositories
+## 4. Amending Commits
 
-### 4.1 Adding Remote Origins
+### 4.1 Basic Amend Usage
+
+**Git commit --amend** allows you to modify the most recent commit without creating a new commit. This is useful for fixing mistakes in your last commit.
+
+```bash
+git commit --amend
+```
+
+This command opens your default text editor to modify the commit message and includes any currently staged changes into the last commit.
+
+### 4.2 Amending Commit Messages
+
+#### Change Only the Commit Message
+```bash
+git commit --amend -m "New improved commit message"
+```
+Changes the commit message of the last commit without opening an editor.
+
+#### Interactive Message Editing
+```bash
+git commit --amend
+```
+Opens your default editor to modify the commit message. The existing message will be pre-loaded for editing.
+
+### 4.3 Adding Files to Last Commit
+
+#### Add Forgotten Files
+```bash
+git add forgotten-file.txt
+git commit --amend --no-edit
+```
+The `--no-edit` flag keeps the existing commit message unchanged while adding the staged files to the last commit.
+
+#### Add Files and Update Message
+```bash
+git add forgotten-file.txt
+git commit --amend -m "Updated commit with forgotten file"
+```
+
+#### Common Workflow Example
+```bash
+# You made a commit but forgot to add a file
+git commit -m "Add user authentication feature"
+
+# Realize you forgot to add the CSS file
+git add styles/auth.css
+
+# Add it to the previous commit without changing the message
+git commit --amend --no-edit
+```
+
+### 4.4 When to Use and When to Avoid
+
+#### ✅ Safe to Use When:
+- The commit hasn't been pushed to a remote repository yet
+- You're working on a feature branch that only you are using
+- Fixing typos in commit messages
+- Adding forgotten files to the last commit
+- Combining staged changes with the previous commit
+
+#### ⚠️ Use with Caution When:
+- Working on shared branches where others might have based work on your commits
+- The commit has been pushed to a remote repository (requires force push)
+
+#### ❌ Avoid When:
+- Multiple people are collaborating on the same branch
+- The commit is part of the main/master branch history
+- You're unsure if others have already pulled your changes
+
+#### Force Push After Amend (Use Carefully)
+```bash
+git commit --amend -m "Fixed commit message"
+git push --force-with-lease origin feature-branch
+```
+
+**Important:** `--force-with-lease` is safer than `--force` as it checks that you have the latest changes before overwriting the remote branch.
+
+#### Alternative: Create a New Commit Instead
+If you're unsure about amending, it's often safer to create a new commit:
+```bash
+git add forgotten-file.txt
+git commit -m "Add forgotten authentication styles"
+```
+
+## 5. Remote Repositories
+
+### 5.1 Adding Remote Origins
 
 #### Connect to Remote Server (GitHub, GitLab, etc.)
 ```bash
@@ -179,7 +270,7 @@ git remote add origin ../another-project/.git
 - Sharing code between local projects
 - Learning git without needing internet access
 
-### 4.2 Remote to Local Folder
+### 5.2 Remote to Local Folder
 
 #### Example: Setting Up Local Remote
 ```bash
@@ -200,7 +291,7 @@ git clone /path/to/source/repo /path/to/destination/repo
 git clone ../existing-project new-project-copy
 ```
 
-### 4.3 Working with Remotes
+### 5.3 Working with Remotes
 
 #### View Remote Connections
 ```bash
@@ -221,21 +312,21 @@ git remote remove origin        # Remove remote connection
 git remote rename origin backup  # Rename remote
 ```
 
-## 5. Branch Management
+## 6. Branch Management
 
-### 5.1 Rename a Branch
+### 6.1 Rename a Branch
 ```bash
 git branch -m oldname newname
 ```
 
-### 5.2 Switch to a Branch (Alternative to checkout)
+### 6.2 Switch to a Branch (Alternative to checkout)
 ```bash
 git switch branch-name
 ```
 
-## 6. Merging
+## 7. Merging
 
-### 6.1 Merge Branches
+### 7.1 Merge Branches
 This is normally done using a visual interface, but the command is available locally:
 ```bash
 git merge name-of-branch
@@ -250,9 +341,9 @@ main ---A---B---C (brancha merged)
                       M (merge commit)
 ```
 
-## 7. Rebasing
+## 8. Rebasing
 
-### 7.1 Git Rebase
+### 8.1 Git Rebase
 ```bash
 git rebase branch-name
 ```
@@ -265,9 +356,9 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## 8. Comparing Changes
+## 9. Comparing Changes
 
-### 8.1 Git Diff Between Branches
+### 9.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -285,15 +376,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## 9. Viewing History and Changes
+## 10. Viewing History and Changes
 
-### 9.1 Basic Commit History
+### 10.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### 9.2 Git Log Formatting Options
+### 10.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -319,7 +410,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### 9.3 Advanced Git Log Combinations
+### 10.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -339,7 +430,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### 9.4 Useful Log Filters
+### 10.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -360,7 +451,7 @@ git log --since="2 weeks ago" --until="yesterday"
 Shows commits within a specific time range.
 
 
-## 10. Additional Resources
+## 11. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=7290)
