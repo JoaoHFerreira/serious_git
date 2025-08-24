@@ -10,21 +10,25 @@
    - 3.1 [Git Restore vs Git Reset - Key Differences](#31-git-restore-vs-git-reset---key-differences)
    - 3.2 [When to Use Each](#32-when-to-use-each)
    - 3.3 [Reset Target Options](#33-reset-target-options)
-4. [Branch Management](#4-branch-management)
-   - 4.1 [Rename a Branch](#41-rename-a-branch)
-   - 4.2 [Switch to a Branch (Alternative to checkout)](#42-switch-to-a-branch-alternative-to-checkout)
-5. [Merging](#5-merging)
-   - 5.1 [Merge Branches](#51-merge-branches)
-6. [Rebasing](#6-rebasing)
-   - 6.1 [Git Rebase](#61-git-rebase)
-7. [Comparing Changes](#7-comparing-changes)
-   - 7.1 [Git Diff Between Branches](#71-git-diff-between-branches)
-8. [Viewing History and Changes](#8-viewing-history-and-changes)
-   - 8.1 [Basic Commit History](#81-basic-commit-history)
-   - 8.2 [Git Log Formatting Options](#82-git-log-formatting-options)
-   - 8.3 [Advanced Git Log Combinations](#83-advanced-git-log-combinations)
-   - 8.4 [Useful Log Filters](#84-useful-log-filters)
-9. [Additional Resources](#9-additional-resources)
+4. [Remote Repositories](#4-remote-repositories)
+   - 4.1 [Adding Remote Origins](#41-adding-remote-origins)
+   - 4.2 [Remote to Local Folder](#42-remote-to-local-folder)
+   - 4.3 [Working with Remotes](#43-working-with-remotes)
+5. [Branch Management](#5-branch-management)
+   - 5.1 [Rename a Branch](#51-rename-a-branch)
+   - 5.2 [Switch to a Branch (Alternative to checkout)](#52-switch-to-a-branch-alternative-to-checkout)
+6. [Merging](#6-merging)
+   - 6.1 [Merge Branches](#61-merge-branches)
+7. [Rebasing](#7-rebasing)
+   - 7.1 [Git Rebase](#71-git-rebase)
+8. [Comparing Changes](#8-comparing-changes)
+   - 8.1 [Git Diff Between Branches](#81-git-diff-between-branches)
+9. [Viewing History and Changes](#9-viewing-history-and-changes)
+   - 9.1 [Basic Commit History](#91-basic-commit-history)
+   - 9.2 [Git Log Formatting Options](#92-git-log-formatting-options)
+   - 9.3 [Advanced Git Log Combinations](#93-advanced-git-log-combinations)
+   - 9.4 [Useful Log Filters](#94-useful-log-filters)
+10. [Additional Resources](#10-additional-resources)
 
 ## 1. Configuration
 
@@ -126,21 +130,85 @@ git reset --soft abc1234
 git reset --hard abc1234
 ```
 
-## 4. Branch Management
+## 4. Remote Repositories
 
-### 3.1 Rename a Branch
+### 4.1 Adding Remote Origins
+
+#### Connect to Remote Server (GitHub, GitLab, etc.)
+```bash
+git remote add origin https://github.com/username/repository.git
+git remote add origin git@github.com:username/repository.git
+```
+Connects your local repository to a remote server for collaboration and backup.
+
+#### Connect to Local Folder
+```bash
+git remote add origin /path/to/another/local/repo
+git remote add origin ../another-project/.git
+```
+**Important:** You can also connect to another local folder/repository on your machine. This is useful for:
+- Testing workflows locally
+- Creating backups on the same machine  
+- Sharing code between local projects
+- Learning git without needing internet access
+
+### 4.2 Remote to Local Folder
+
+#### Example: Setting Up Local Remote
+```bash
+# Create a bare repository to act as "remote"
+mkdir /tmp/my-remote-repo.git
+cd /tmp/my-remote-repo.git
+git init --bare
+
+# In your main project, add this local folder as remote
+cd /path/to/your/project
+git remote add origin /tmp/my-remote-repo.git
+git push -u origin main
+```
+
+#### Cloning from Local Repository
+```bash
+git clone /path/to/source/repo /path/to/destination/repo
+git clone ../existing-project new-project-copy
+```
+
+### 4.3 Working with Remotes
+
+#### View Remote Connections
+```bash
+git remote -v                    # Show all remotes with URLs
+git remote show origin           # Show detailed info about origin
+```
+
+#### Push and Pull
+```bash
+git push origin main             # Push to remote
+git pull origin main             # Pull from remote
+git fetch origin                 # Fetch changes without merging
+```
+
+#### Remove or Rename Remotes
+```bash
+git remote remove origin        # Remove remote connection
+git remote rename origin backup  # Rename remote
+```
+
+## 5. Branch Management
+
+### 5.1 Rename a Branch
 ```bash
 git branch -m oldname newname
 ```
 
-### 3.2 Switch to a Branch (Alternative to checkout)
+### 5.2 Switch to a Branch (Alternative to checkout)
 ```bash
 git switch branch-name
 ```
 
-## 4. Merging
+## 6. Merging
 
-### 4.1 Merge Branches
+### 6.1 Merge Branches
 This is normally done using a visual interface, but the command is available locally:
 ```bash
 git merge name-of-branch
@@ -155,9 +223,9 @@ main ---A---B---C (brancha merged)
                       M (merge commit)
 ```
 
-## 5. Rebasing
+## 7. Rebasing
 
-### 5.1 Git Rebase
+### 7.1 Git Rebase
 ```bash
 git rebase branch-name
 ```
@@ -170,53 +238,9 @@ main ---A---B---C
                   D'---E' (rebased branchb)
 ```
 
-## 6. Resetting Changes
+## 8. Comparing Changes
 
-### 6.1 Git Reset Options
-
-#### Soft Reset
-```bash
-git reset --soft HEAD~1
-git reset --soft COMMIT_HASH
-```
-Moves the HEAD pointer back but keeps your changes staged (ready to commit). Use this when you want to undo commits but keep your work ready for a new commit.
-
-#### Hard Reset
-```bash
-git reset --hard HEAD~1
-git reset --hard COMMIT_HASH
-```
-Moves the HEAD pointer back and **permanently deletes** all changes in your working directory and staging area. Use with caution as this cannot be undone.
-
-### 6.2 Reset Target Options
-
-#### Using HEAD~ notation
-- `HEAD~1` - Go back 1 commit
-- `HEAD~2` - Go back 2 commits  
-- `HEAD~3` - Go back 3 commits
-
-#### Using Commit Hash
-You can get the commit hash from `git log` and use it directly:
-```bash
-git reset --soft abc1234
-git reset --hard abc1234
-```
-
-### 6.3 When to Use Each
-
-**Use `--soft` when:**
-- You want to combine multiple commits into one
-- You made a mistake in the last commit message
-- You want to reorganize your commits
-
-**Use `--hard` when:**
-- You want to completely abandon recent changes
-- You want to return to a previous state and discard all work
-- **Warning:** This permanently deletes your changes!
-
-## 7. Comparing Changes
-
-### 7.1 Git Diff Between Branches
+### 8.1 Git Diff Between Branches
 ```bash
 git diff branch1..branch2
 ```
@@ -234,15 +258,15 @@ git diff HEAD..other-branch
 - `git diff feature-branch..main` - See what changes main has that your feature branch doesn't
 - `git diff HEAD..origin/main` - Compare your current branch with the remote main branch
 
-## 8. Viewing History and Changes
+## 9. Viewing History and Changes
 
-### 8.1 Basic Commit History
+### 9.1 Basic Commit History
 ```bash
 git log
 ```
 Shows detailed commit history with full commit messages, author, date, and commit hashes.
 
-### 8.2 Git Log Formatting Options
+### 9.2 Git Log Formatting Options
 
 #### Short Format (Oneline)
 ```bash
@@ -268,7 +292,7 @@ git log --parents
 ```
 Displays the parent commit hashes for each commit, useful for understanding merge relationships.
 
-### 8.3 Advanced Git Log Combinations
+### 9.3 Advanced Git Log Combinations
 
 #### Complete Visual History
 ```bash
@@ -288,7 +312,7 @@ git log --oneline --graph --decorate --all
 ```
 Displays history for all branches, not just the current one.
 
-### 8.4 Useful Log Filters
+### 9.4 Useful Log Filters
 
 #### Limit Number of Commits
 ```bash
@@ -309,7 +333,7 @@ git log --since="2 weeks ago" --until="yesterday"
 Shows commits within a specific time range.
 
 
-## 9. Additional Resources
+## 10. Additional Resources
 
 ### Video Tutorial
 [Git Tutorial Video](https://youtu.be/rH3zE7VlIMs?t=2445)
