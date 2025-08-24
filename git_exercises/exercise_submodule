@@ -1,0 +1,89 @@
+## 📝 Exercise: Work with Git Submodules
+
+### Setup
+
+1. Create a "main project":
+
+   ```bash
+   mkdir main-project && cd main-project
+   git init
+   echo "# Main Project" > README.md
+   git add README.md
+   git commit -m "Initial commit in main project"
+   ```
+
+2. In another directory, create a "library project":
+
+   ```bash
+   cd ..
+   mkdir library-project && cd library-project
+   git init
+   echo "# Library Project" > README.md
+   git add README.md
+   git commit -m "Initial commit in library project"
+   ```
+
+3. Add one more commit in the library:
+
+   ```bash
+   echo "Version 1.0" > version.txt
+   git add version.txt
+   git commit -m "Add version file"
+   ```
+
+---
+
+### Task
+
+Now go back to your **main-project** and do the following:
+
+1. Add `library-project` as a submodule inside a folder called `libs/library`:
+
+   ```bash
+   git submodule add ../library-project libs/library
+   git commit -m "Add library-project as submodule"
+   ```
+
+2. Simulate updating the library:
+
+   * Go into `library-project`, add a new commit:
+
+     ```bash
+     echo "Version 2.0" > version.txt
+     git add version.txt
+     git commit -m "Update to version 2.0"
+     ```
+   * Return to `main-project`, update the submodule:
+
+     ```bash
+     cd ../main-project
+     cd libs/library
+     git pull origin master   # or main
+     cd ../..
+     git add libs/library
+     git commit -m "Update library submodule to version 2.0"
+     ```
+
+3. Clone your `main-project` into a new folder, and initialize submodules:
+
+   ```bash
+   git clone ../main-project cloned-main
+   cd cloned-main
+   git submodule update --init --recursive
+   ```
+
+---
+
+### ✅ Success criteria
+
+* The `main-project` repo has the `library-project` included under `libs/library`.
+* After updating the library, your main repo reflects **Version 2.0**.
+* When cloning the main repo, the submodule is correctly initialized.
+
+---
+
+⚡️ Bonus challenge: Try running `git submodule status` in the cloned repo and confirm it points to the right commit of the library.
+
+---
+
+Want me to also create a **second-level submodule exercise** (submodule inside another submodule), or keep it simple with this one?
