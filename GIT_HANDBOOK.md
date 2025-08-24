@@ -6,6 +6,7 @@
    - 1.1 [Set Default Branch Name](#11-set-default-branch-name)
 2. [File Management](#2-file-management)
    - 2.1 [Ignore Files You Don't Want Committed](#21-ignore-files-you-dont-want-committed)
+   - 2.2 [Remove Files from Git Tracking](#22-remove-files-from-git-tracking)
 3. [Restoring and Resetting Changes](#3-restoring-and-resetting-changes)
    - 3.1 [Git Restore vs Git Reset - Key Differences](#31-git-restore-vs-git-reset---key-differences)
    - 3.2 [When to Use Each](#32-when-to-use-each)
@@ -42,6 +43,32 @@ git config --global init.defaultBranch main
 ### 2.1 Ignore Files You Don't Want Committed
 ```bash
 echo the_created_changed_thing >> .gitignore
+```
+
+### 2.2 Remove Files from Git Tracking
+```bash
+git rm --cached file-to-delete
+```
+Removes a file from Git's tracking system without deleting it from your working directory. This is useful when:
+- You want to stop tracking a file that was previously committed
+- You accidentally committed a file that should have been ignored
+- You want to apply .gitignore rules to files that are already being tracked
+
+**Important:** The file will be deleted from the repository on the next commit, but it will remain in your local working directory. Other collaborators will see the file as deleted when they pull the changes.
+
+#### Common Use Cases:
+```bash
+git rm --cached config.env           # Stop tracking environment files
+git rm --cached -r node_modules/     # Stop tracking entire directories
+git rm --cached *.log               # Stop tracking all log files
+```
+
+After using `git rm --cached`, remember to add the file pattern to `.gitignore` to prevent it from being tracked again:
+```bash
+git rm --cached config.env
+echo "config.env" >> .gitignore
+git add .gitignore
+git commit -m "Stop tracking config.env and add to gitignore"
 ```
 
 ## 3. Restoring and Resetting Changes
