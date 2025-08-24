@@ -1,0 +1,119 @@
+Perfect 👍 let’s do a **simple exercise for `git revert`** — one of the safest commands to practice because it creates a *new commit that undoes a previous commit*, instead of rewriting history.
+
+---
+
+# 📝 Exercise: Use `git revert` to undo a commit
+
+## 🔹 Setup
+
+1. Create a repo:
+
+   ```bash
+   mkdir revert-demo && cd revert-demo
+   git init
+   ```
+
+2. Add an initial file:
+
+   ```bash
+   echo "Hello" > app.txt
+   git add app.txt
+   git commit -m "Initial commit"
+   ```
+
+3. Add two more commits:
+
+   ```bash
+   echo "Feature A" >> app.txt
+   git commit -am "Add Feature A"
+
+   echo "Feature B" >> app.txt
+   git commit -am "Add Feature B"
+   ```
+
+Now your file looks like:
+
+```
+Hello
+Feature A
+Feature B
+```
+
+And history:
+
+```
+Add Feature B
+Add Feature A
+Initial commit
+```
+
+---
+
+## 🔹 Task
+
+Your job: **undo the “Feature B” commit using `git revert`.**
+
+1. Find the commit hash:
+
+   ```bash
+   git log --oneline
+   ```
+
+   Example output:
+
+   ```
+   a1b2c3 Add Feature B
+   d4e5f6 Add Feature A
+   g7h8i9 Initial commit
+   ```
+
+2. Revert it:
+
+   ```bash
+   git revert a1b2c3
+   ```
+
+3. Check the file:
+
+   ```bash
+   cat app.txt
+   ```
+
+   Output should be:
+
+   ```
+   Hello
+   Feature A
+   ```
+
+   ✅ “Feature B” is gone.
+
+4. Look at history again:
+
+   ```bash
+   git log --oneline
+   ```
+
+   You’ll see a new commit:
+
+   ```
+   h9i8j7 Revert "Add Feature B"
+   a1b2c3 Add Feature B
+   d4e5f6 Add Feature A
+   g7h8i9 Initial commit
+   ```
+
+---
+
+## ✅ Success criteria
+
+* Your file no longer contains “Feature B”.
+* Your history shows a **new revert commit**, not a rewrite.
+
+---
+
+⚡️ Bonus challenge: Try `git revert -n <hash>` to stage a revert without committing immediately, then edit the changes before committing.
+
+---
+
+Want me to also prepare a **follow-up exercise on `git reset`** so you can compare the difference between `reset` and `revert`?
