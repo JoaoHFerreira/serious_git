@@ -1,4 +1,5 @@
 1. git bisect: Make it clear bisect, explain that normally is used to detect some not desired bug, and goes like good bad untill find the exact commit that introduces a bad behaviour
 2. revert: Revert will revert an spefici commit, not the entire story, would be something like A -- B -- C -- D -- E -- F (undo B)
 3. git rebase | When rebase 2 crucial things. 1. Always rebase from feature branch, git rebase main, never rebase the main.. 2. after the commit in reabase, run git rabase --continue to finish the process
+4. Explain the usage of git reabase if not yet explained using -i flag and also squashimg commits
 
