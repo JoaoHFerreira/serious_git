@@ -262,7 +262,9 @@ git reset --hard abc1234
 
 ## 5. Reverting Commits
 
-Git revert creates a new commit that undoes the changes from a previous commit. Unlike reset, revert is safe to use on shared branches because it doesn't change history - it adds new history.
+Git revert creates a new commit that undoes the changes from a **specific commit**, not the entire commit history. Unlike reset, revert is safe to use on shared branches because it doesn't change history - it adds new history.
+
+**Important:** Revert targets individual commits. For example, if your history is A → B → C → D → E → F, reverting commit B creates a new commit that undoes only B's changes, leaving the history as A → B → C → D → E → F → (undo B).
 
 ### 5.1 Basic Git Revert
 
@@ -600,16 +602,44 @@ main ---A---B---C (brancha merged)
 ## 12. Rebasing
 
 ### 12.1 Git Rebase
+
+Git rebase replays your commits on top of another branch, creating a linear history instead of merge commits.
+
+#### ⚠️ Two Crucial Rebase Rules:
+
+1. **Always rebase FROM the feature branch** - Never rebase the main branch
+2. **Use `git rebase --continue`** after resolving conflicts to finish the process
+
 ```bash
-git rebase branch-name
+# CORRECT: Rebase from feature branch onto main
+git checkout feature-branch
+git rebase main
+
+# WRONG: Never do this on shared branches
+git checkout main
+git rebase feature-branch  # ❌ Don't rebase main!
 ```
-Updates where your base points to by replaying your commits on top of another branch. This creates a linear history instead of merge commits.
+
+#### Basic Rebase Workflow
+```bash
+# Switch to your feature branch
+git checkout feature-branch
+
+# Rebase onto main
+git rebase main
+
+# If conflicts occur, resolve them then:
+git add .
+git rebase --continue
+
+# Keep repeating until rebase completes
+```
 
 **Visual representation of rebase:**
 ```
 main ---A---B---C
                  \
-                  D'---E' (rebased branchb)
+                  D'---E' (rebased feature-branch)
 ```
 
 ## 13. Cherry-Picking Commits
